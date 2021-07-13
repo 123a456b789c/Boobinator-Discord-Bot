@@ -297,6 +297,6 @@ getWeather();
 
 //Token helye
 
-client.login('ODYzMDcyNjY0ODYzNzY4NjA2.YOhlDg.6Zh6WJFPbZtCtdjPRzCSNs_zubo');
+client.login('TOKEN');
 
 
