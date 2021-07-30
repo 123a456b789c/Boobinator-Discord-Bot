@@ -23,7 +23,10 @@ Replace the ('TOKEN') fiels with your bot token.
 
 # Command list
 
-![image](https://user-images.githubusercontent.com/50078004/125432935-cce0f1fa-65a4-4869-a538-461e1078ac1f.png)
+![image](https://user-images.githubusercontent.com/50078004/127632012-5d8b6cee-68e4-414c-8c1d-984ee8d33f3f.png)
+![image](https://user-images.githubusercontent.com/50078004/127632037-26f7f844-d0f3-4537-b5bb-a6acf0f8fdc0.png)
+![image](https://user-images.githubusercontent.com/50078004/127632076-d16c04e3-90a6-49c9-aae8-2d34b1adcf0b.png)
+
 
 ## Deutsch (DE)
 
