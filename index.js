@@ -1,4 +1,3 @@
-
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -9,32 +8,401 @@ app.listen(port, () => console.log(`A program a következő portszámot kapta:${
 //BOT KÓD KEZDÉSE
 
 //Külső függvénykönyvtárak
+//npm i sqlite3
+//npm i sequelize
+var leveling = require('discord-leveling')
+const status = require('minecraft-server-status');
 const parser = require('rss-url-parser')
 const rf = require('reddit-image-fetcher')
 const covid = require('corona-info');
 const weather = require('weather-api-data');
 const Discord = require('discord.js');
+const disbut = require('discord-buttons');
+const nevnap = require ('nevnap');
+const DiscordPages = require("discord-pages");
 const client = new Discord.Client();
+disbut(client);
 
 //Inicializáláskor fut le
 client.on('ready', () => {
-    console.log("Connected as " + client.user.tag);
-    client.user.setActivity(".help", {type: "PLAYING"});
+  console.log("Connected as " + client.user.tag);
+  client.user.setActivity(".help", {type: "PLAYING"});
+});
+
+client.on('message', msg => {
+  if (msg.content === '.minecraft') {
+  leveling.AddXp(msg.member.user.id, -1)
+  status('mc.hypixel.net', 25565, response => {
+  var stat = response.online
+  if (stat===true) {
+    var emote = ':white_check_mark:';
+  }
+ if (stat===false) {
+    var emote = ':octagonal_sign:';
+ }
+  const embed = new Discord.MessageEmbed()
+  .setColor('#2bff00')
+  .setTitle(`:pick: *Hypixel* Státusz`)
+  .setAuthor("Boobinator")
+  .addField(':video_game: Online:', emote)
+  .addField(':restroom: Játékosok:', `${response.players.now}db / ${response.players.max}db`)
+  .setImage('https://cdn.glitch.com/e58f9f02-0cf8-4a4a-b0a2-17c803c337b2%2Fpng-clipart-minecraft-grass-illustration-minecraft-pocket-edition-minecraft-story-mode-the-technomancer-xbox-360-ico-minecraft-miscellaneous-grass.png?v=1626368827244')
+  msg.reply(embed)
+});
+  }
+});
+
+client.on('message', msg => {
+  if (msg.content.startsWith('.minecraftd')) {
+
+  
+  const error3 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Adatok lekérése sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nincs megadva szerver.`)
+
+  leveling.AddXp(msg.member.user.id, -1)
+  var url = msg.content.slice(12).trim().split(' '); 
+  chars = msg.content.length;
+  if (chars < 12) {
+  msg.channel.send(error3)
+  } else {
+  status(url, 25565, response => {
+  var stat = response.online
+  if (stat===true) {
+    var emote = ':white_check_mark:';
+  }
+ if (stat===false) {
+    var emote = ':octagonal_sign:';
+ }
+
+  const embed = new Discord.MessageEmbed()
+  .setColor('#2bff00')
+  .setTitle(`:pick: *${url}* Státusz`)
+  .setAuthor("Boobinator")
+  .addField(':video_game: Online:', emote)
+  .addField(':restroom: Játékosok:', `${response.players.now}db / ${response.players.max}db`)
+  .setImage('https://cdn.glitch.com/e58f9f02-0cf8-4a4a-b0a2-17c803c337b2%2Fpng-clipart-minecraft-grass-illustration-minecraft-pocket-edition-minecraft-story-mode-the-technomancer-xbox-360-ico-minecraft-miscellaneous-grass.png?v=1626368827244')
+  msg.reply(embed)
+ });
+  }
+   
     
+
+
+  }
+});
+
+
+client.on('message', msg => {
+    if (msg.content.toLowerCase().startsWith(".bot")){
+        if(msg.author.bot) return;
+        leveling.AddXp(msg.member.user.id, -1)
+        const exampleEmbed = new Discord.MessageEmbed()
+            .setColor('#fc03cf')
+            .setTitle("A bot élő státusza")
+            .addField(" \u200B ", "**Csatornák** : ` " + `${client.channels.cache.size}` + " `")
+            .addField(" \u200B ", "**Szerverek** : ` " + `${client.guilds.cache.size}` + " `")
+            .addField(" \u200B ", "**Kliensek** : ` " + `${msg.guild.members.cache.size}` + " `")
+        msg.reply(exampleEmbed);
+    }
+})
+
+client.on('message', msg => {
+  if (msg.content.startsWith('.kick')) {
+    leveling.AddXp(msg.member.user.id, -1)
+  const error1 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Tag eltávolítása sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nem jogosult a parancs használatához`)
+
+  const error2 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Tag eltávolítása sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Felhasználó nem kirúgható.`)
+
+  const error3 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Tag eltávolítása sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nincs kijelölve tag, vagy nem megfelelő kijelölés. (Használja a @említés formátumot!`)
+
+  let member = msg.mentions.members.first();
+  if (!msg.member.hasPermission('KICK_MEMBERS')) return msg.reply(error1)
+  if(!member) return msg.reply(error3);
+  if(!member.kickable) return msg.reply(error2);
+  member.kick();
+  const embed = new Discord.MessageEmbed()
+  .setColor('#2bff00')
+  .setTitle("Siker - Tag eltávolítva")
+  .setAuthor("Boobinator")
+  .setImage('https://cdn.glitch.com/e58f9f02-0cf8-4a4a-b0a2-17c803c337b2%2F523-5232109_check-mark-computer-icons-clip-art-green-checkmark.png?v=1626359493911')
+  msg.reply(embed)
+
+
+  
+  }
+});
+
+client.on('message', msg => {
+  if (msg.content.startsWith('.purge')) {
+    leveling.AddXp(msg.member.user.id, -1)
+
+
+  const error1 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Törlés sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nem jogosult a parancs használatához`)
+
+const error3 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Törlés sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Üzenetek száma mező nem értelmezhető vagy üres.`)
+
+const error2 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Törlés sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Üzenetek száma tatományon kívül (0 < szám > 100)`)  
+
+
+var args = msg.content.slice(7).trim().split(' '); 
+var txt = args.toString();
+var num = Number(txt)
+if (!msg.member.hasPermission("KICK_MEMBERS")) return msg.channel.send(error1)
+if (!num) return msg.reply(error3);
+if (isNaN(num)) return msg.reply(error3);
+if (num > 100) return msg.reply(error2); 
+if (num < 1) return msg.reply(error2);
+var num3 = num + 3
+
+let button = new disbut.MessageButton()
+  .setLabel("Törlés")
+  .setID("myid")
+  .setStyle("red");
+
+
+const  ok = new Discord.MessageEmbed()
+  .setColor('#ff0000')
+  .setTitle("Nyomd meg a törlés megerősítéséhez!")
+  .setAuthor("Boobinator")
+
+msg.channel.send(ok, button);
+
+
+
+
+async function bulk() {
+await msg.channel.messages.fetch({ limit: num3 }).then(messages => { 
+    msg.channel.bulkDelete(messages);
+});
+};
+
+client.on('clickButton', async (button) => {
+await button.clicker.fetch();
+if (!button.clicker.member.hasPermission("KICK_MEMBERS")) return
+bulk();
 });
 
 
 
+  
+  }
+});
+
+
+client.on('message', msg => {
+  if (msg.content.startsWith('.ban')) {
+    leveling.AddXp(msg.member.user.id, -1)
+  const error1 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Tag kitiltása sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nem jogosult a parancs használatához`)
+
+  const error2 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Tag kitiltása sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Felhasználó nem kirúgható.`)
+
+  const error3 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Tag kitiltása sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nincs kijelölve tag, vagy nem megfelelő kijelölés. (Használja a @említés formátumot!`)
+
+if (!msg.member.hasPermission("BAN_MEMBERS")) return msg.channel.send(error1)
+let member = msg.mentions.members.first();
+if (!member) return msg.channel.send(error3)
+if (member.hasPermission("BAN_MEMBERS")) return msg.reply(error2)
+let banReason = (`Operátor által eltávolítva. ${msg.author}`)
+member.ban({reason: banReason})
+  const embed = new Discord.MessageEmbed()
+  .setColor('#2bff00')
+  .setTitle("Siker - Tag eltávolítva")
+  .setAuthor("Boobinator")
+  .setImage('https://cdn.glitch.com/e58f9f02-0cf8-4a4a-b0a2-17c803c337b2%2F523-5232109_check-mark-computer-icons-clip-art-green-checkmark.png?v=1626359493911')
+  msg.reply(embed)
+
+
+  
+  }
+});
+
+client.on('message', msg => {
+if(msg.author.bot) return;
+leveling.AddXp(msg.member.user.id, 1);
+});
+
+
+client.on('message', msg => {
+var prc = msg.content.toLowerCase();
+var szl = Array('fasz','geci','kurva','lófasz','köcsög','ondógyurma','buzi','cigány','bazmeg','baszd meg','baszdmeg','baszlak','kúrok','kúrsz','kúrom','kúrod','picsa','ringyó','ribanc')
+for (var i = 0; i < szl.length; i++) {
+  if (prc.includes(szl[i])) {
+    msg.delete();
+  leveling.AddXp(msg.member.user.id, -11)
+  const embed = new Discord.MessageEmbed()
+  .setTitle('Üzenet Törölve')
+  .setColor('#e60400')
+  .setDescription("Szerver-moderáció")
+  .setAuthor(msg.author)
+  .addField('Törlés oka', 'Üzenet tartalma szerepel a tiltólistán.')
+  .addField('Üzenet', `||${msg.content}||`)
+  .setImage('https://cdn.glitch.com/e58f9f02-0cf8-4a4a-b0a2-17c803c337b2%2F6053-3100-allj-elsobbsegadas-kotelezo-stop-tabla.png?v=1626338794156')
+  msg.reply(embed)
+    break;
+  }
+}
+});
+
+client.on('message', msg => {
+  if (msg.content.startsWith('.weatherd')) {
+    leveling.AddXp(msg.member.user.id, -1)
+const error3 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - Időjárás betöltése sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nincs kijelölve hely!`)
+
+async function getWeatherdinamic() {
+  const data = await weather.loction(location);
+  var image = `https:${data.current.condition.icon}`
+  const embed = new Discord.MessageEmbed()
+  .setTitle(`:cityscape: ${data.location.name}`)
+  .setColor('#0c9417')
+  .setDescription("with weather-api-data (JS)")
+  .setAuthor(data.location.country)
+  .addField('Hőmérséklet', data.current.temp_c + 'C°')
+  .addField('Időjárás',data.current.condition.text)
+  .setImage(image)
+  msg.reply(embed)
+}
+
+	const location = msg.content.slice(9).trim().split(' ');
+chars = msg.content.length;
+  if (chars < 10) {
+  msg.channel.send(error3)
+  } else {
+  getWeatherdinamic();
+  }
+
+  }
+});
+
+client.on('message', msg => {
+  if (msg.content.startsWith('.rssd')) {
+    leveling.AddXp(msg.member.user.id, -1)
+async function RSSD() {
+var page = arg1[0]
+var url = arg1[1]
+const data = await parser(url)
+var check = data[page+0].title
+var check1 = data[page+1].title
+var check2 = data[page+2].title
+if (check !==undefined || check1 !==undefined || check2 !==undefined) {
+  var feed = data[page+0]
+  const embed = new Discord.MessageEmbed()
+  .setColor('#00ffb6')
+  .setTitle(`:scroll: ${feed.title} :scroll:`)
+  .setAuthor("RSS")
+  .addField(":chains: Link:",feed.link)
+  msg.reply(embed)
+
+  var feed1 = data[page+1]
+  const embed1 = new Discord.MessageEmbed()
+  .setColor('#00ffb6')
+  .setTitle(`:scroll: ${feed1.title} :scroll:`)
+  .setAuthor("RSS")
+  .addField(":chains: Link:",feed1.link)
+  msg.reply(embed1)
+
+  var feed2 = data[page+2]
+  const embed2 = new Discord.MessageEmbed()
+  .setColor('#00ffb6')
+  .setTitle(`:scroll: ${feed2.title} :scroll:`)
+  .setAuthor("RSS")
+  .addField(":chains: Link:",feed2.link)
+  msg.reply(embed2)
+}
+}
+
+
+
+	const arg1 = msg.content.slice(5).trim().split(' ');
+
+const error3 = new Discord.MessageEmbed()
+  .setColor('#ff2200')
+  .setTitle("Hiba - RSS betöltése sikertelen")
+  .setAuthor("Boobinator")
+  .addField('Ok:', `Nincs kijelölve RSS feed!`)
+
+  chars = msg.content.length;
+  if (chars < 6) {
+  msg.channel.send(error3)
+  } else {
+  RSSD();
+  }
+
+  }
+});
+
+client.on('message', msg => {
+  if (msg.content === '.xp') {
+
+    leveling.AddXp(msg.member.user.id, -1)
+async function eco() {
+var data = await leveling.Fetch(msg.member.user.id)
+const embed2 = new Discord.MessageEmbed()
+  .setColor('#93a832')
+  .setTitle(`:cowboy: Adatok ${msg.author.username} felhasználóról`)
+  .setAuthor("Discord XP")
+  .addField(":star: XP:",data.xp)
+  .addField(":regional_indicator_i: :regional_indicator_d: Userid:",msg.member.user.id)
+  msg.reply(embed2)
+}
+
+eco();
+
+}
+});
+
 //Mém parancs
 client.on('message', msg => {
   if (msg.content === '.meme') {
-
+    leveling.AddXp(msg.member.user.id, -1)
 //Array kezelő
 function getFields(input, field) {
-    var output = [];
-    for (var i=0; i < input.length ; ++i)
-        output.push(input[i][field]);
-    return output;
+  var output = [];
+  for (var i=0; i < input.length ; ++i)
+  output.push(input[i][field]);
+  return output;
 }
 
 
@@ -43,16 +411,16 @@ async function meme() {
 var image = await rf.fetch({type: 'meme'});
   var result = getFields(image, "image");
   let text = result.toString();
-    var result1 = getFields(image, "title");
+  var result1 = getFields(image, "title");
   let title = result1.toString();
-    var result2 = getFields(image, "subreddit");
+  var result2 = getFields(image, "subreddit");
   let reddit = result2.toString();
-   const embed = new Discord.MessageEmbed()
-    .setColor('#FF5700')
-    .setTitle(title)
-    .setAuthor(reddit)
-    .setImage(text)
-    msg.reply(embed)
+  const embed = new Discord.MessageEmbed()
+  .setColor('#FF5700')
+  .setTitle(title)
+  .setAuthor(reddit)
+  .setImage(text)
+  msg.reply(embed)
 }
 
 meme();
@@ -63,47 +431,48 @@ meme();
 //.porn parancs
 client.on('message', msg => {
   if (msg.content === '.porn') {
+    leveling.AddXp(msg.member.user.id, -2)
   const RandomHub = require('random-hub').RandomHub;
   const hub = new RandomHub();
   const embed = new Discord.MessageEmbed()
-    .setColor('#0d09e3')
-    .setTitle("NSFW GIF")
-    .setAuthor("Boobinator")
-    .setImage(hub.getRandomHub('real'))
-    msg.reply(embed)
+  .setColor('#0d09e3')
+  .setTitle("NSFW GIF")
+  .setAuthor("Boobinator")
+  .setImage(hub.getRandomHub('real'))
+  msg.reply(embed)
   }
 });
 
 //RSS olvasó parancs (parser után RSS url)
 client.on('message', msg => {
   if (msg.content === '.rss') {
-
+    leveling.AddXp(msg.member.user.id, -1)
 async function RSS() {
 
   const data = await parser('https://telex.hu/rss')
   var feed = data[0]
   const embed = new Discord.MessageEmbed()
-    .setColor('#00ffb6')
-    .setTitle(feed.title)
-    .setAuthor("RSS")
-    .addField("Link",feed.link)
-    msg.reply(embed)
+  .setColor('#00ffb6')
+  .setTitle(`:scroll: ${feed.title}`)
+  .setAuthor("RSS")
+  .addField(":chains: Link",feed.link)
+  msg.reply(embed)
 
   var feed1 = data[1]
   const embed1 = new Discord.MessageEmbed()
-    .setColor('#00ffb6')
-    .setTitle(feed1.title)
-    .setAuthor("RSS")
-    .addField("Link",feed1.link)
-    msg.reply(embed1)
+  .setColor('#00ffb6')
+  .setTitle(`:scroll: ${feed1.title}`)
+  .setAuthor("RSS")
+  .addField(":chains: Link",feed1.link)
+  msg.reply(embed1)
 
-     var feed2 = data[2]
+  var feed2 = data[2]
   const embed2 = new Discord.MessageEmbed()
-    .setColor('#00ffb6')
-    .setTitle(feed2.title)
-    .setAuthor("RSS")
-    .addField("Link",feed2.link)
-    msg.reply(embed2)
+  .setColor('#00ffb6')
+  .setTitle(`:scroll: ${feed2.title}`)
+  .setAuthor("RSS")
+  .addField(":chains: Link",feed2.link)
+  msg.reply(embed2)
 };
 
 RSS();
@@ -113,36 +482,36 @@ RSS();
 
 //Covid adatok parancs
 client.on('message', msg => {
-  if (msg.content === '.covid') {
-
+if (msg.content === '.covid') {
+  leveling.AddXp(msg.member.user.id, -1)
 const covidData = async () => {
-    let data = await covid.findData({ country: "all" });
-    const embed = new Discord.MessageEmbed()
-    .setColor('#d62a0f')
-    .setTitle("Covid Adatok")
-    .setAuthor("Covid World")
-    .addField("Elhalálozások",data.deaths)
-    .addField("Intenzív osztályon ápoltak",data.critical)
-    .addField("Ma gyógyultak",data.todayRecovered)
-    .addField("Fertőzések",data.cases)
-    .addField("Mai Fertőzések",data.todayCases)
-    msg.reply(embed)
+  let data = await covid.findData({ country: "all" });
+  const embed = new Discord.MessageEmbed()
+  .setColor('#d62a0f')
+  .setTitle("Covid Adatok")
+  .setAuthor("Covid World")
+  .addField("Elhalálozások",data.deaths)
+  .addField("Intenzív osztályon ápoltak",data.critical)
+  .addField("Ma gyógyultak",data.todayRecovered)
+  .addField("Fertőzések",data.cases)
+  .addField("Mai Fertőzések",data.todayCases)
+  msg.reply(embed)
 }
 
 covidData();
 
 const covidDatah = async () => {
-    let datah = await covid.findData({ country: "Hungary" });
-    const embed = new Discord.MessageEmbed()
-    .setColor('#d62a0f')
-    .setTitle("Covid Adatok")
-    .setAuthor("Covid HU")
-    .addField("Elhalálozások",datah.deaths)
-    .addField("Intenzív osztályon ápoltak",datah.critical)
-    .addField("Ma gyógyultak",datah.todayRecovered)
-    .addField("Fertőzések",datah.cases)
-    .addField("Mai Fertőzések",datah.todayCases)
-    msg.reply(embed)
+  let datah = await covid.findData({ country: "Hungary" });
+  const embed = new Discord.MessageEmbed()
+  .setColor('#d62a0f')
+  .setTitle("Covid Adatok")
+  .setAuthor("Covid HU")
+  .addField("Elhalálozások",datah.deaths)
+  .addField("Intenzív osztályon ápoltak",datah.critical)
+  .addField("Ma gyógyultak",datah.todayRecovered)
+  .addField("Fertőzések",datah.cases)
+  .addField("Mai Fertőzések",datah.todayCases)
+  msg.reply(embed)
 }
 
 covidDatah();
@@ -152,20 +521,24 @@ covidDatah();
 //Pénzfeldobás (viccgenerátrohoz hasonló)
 client.on('message', msg => {
   if (msg.content === '.coin') {
+    leveling.AddXp(msg.member.user.id, -1)
   var pénz = Array('https://cdn.glitch.com/13990099-e10d-435c-9d65-af0aa128255f%2Ffej.png?v=1626111247371','https://cdn.glitch.com/13990099-e10d-435c-9d65-af0aa128255f%2F%C3%ADr%C3%A1s.png?v=1626111249060')
   var oldal = pénz[Math.floor(Math.random()*pénz.length)];
   const embed = new Discord.MessageEmbed()
-.setTitle("Véletlen pénzfeldobás eredménye")
-.setAuthor("Random")
-.setColor('#ffcb0f')
-.setImage(oldal)
-msg.reply(embed)
+  .setTitle("Véletlen pénzfeldobás eredménye")
+  .setAuthor("Random")
+  .setColor('#ffcb0f')
+  .setImage(oldal)
+  msg.reply(embed)
   }
 });
+
+
 
 //Viccgenerátor Array objektum tartalmazza a vicceket, sortörésekkel
 client.on('message', msg => {
   if (msg.content === '.joke') {
+    leveling.AddXp(msg.member.user.id, -1)
   var viccek = Array('Ha az ANYA szóból elveszel egy betűt és hármat kicserélsz, pont azt a szót kapod, hogy SÖR… Hát nem csodálatos a magyar nyelv?',
 '- Édesanyám, mit rakjak a tésztára? \n - A fedőt fiam, hogy apádnak is maradjon.',
 'Mi a különbség a WC és a koporsó között?\nSemmi: ha menni kell, hát menni kell!',
@@ -246,42 +619,57 @@ client.on('message', msg => {
 '- Mit csinál a szú a fában?\n- Perceg.\n- És a kis szú?\n- Másodperceg.')
   var vicc = viccek[Math.floor(Math.random()*viccek.length)];
   const embed = new Discord.MessageEmbed()
-.setTitle("Szóvicc")
-.setAuthor("Hahota")
-.addField(vicc, '/Szóvicc VÉGE/')
-msg.reply(embed)
+  .setTitle("Szóvicc")
+  .setAuthor("Hahota")
+  .addField(vicc, '/Szóvicc VÉGE/')
+  msg.reply(embed)
   }
 });
 
 
 //HELP
 
-
+/*
 client.on('message', msg => {
-  if (msg.content === '.help') {
+  if (msg.content === '.helpall') {
+    leveling.AddXp(msg.member.user.id, -1)
 const embed = new Discord.MessageEmbed()
 .setTitle("Command List")
 .setDescription("Parancsok listája. Prefixum: .")
 .setAuthor("Boobinator")
+.addField("Moderáció", "A csetbot képes a csúnya szavak szűrésére, szövegkörnyezetben is.")
 .addField(".help", "Ezen útmutató lekérése")
 .addField(".porn", "Véletlenszerű NSFW GIF lekérése")
 .addField(".joke", "Véletlenszerű vicc az adatbázisból (bővítés alatt)")
-.addField(".weather", "Budapesti időjárás lekérése")
 .addField(".covid", "Covid információk a világra és országunkra vonatkozóan.")
 .addField(".coin", "Egy pénz véletlen feldobása.")
 .addField(".meme", "Egy Véletlenszerű Reddit mém lekérése.")
+.addField(".weather", "Budapesti időjárás lekérése")
+.addField(".weatherd <hely>", "Időjárás <hely>-re vonatkozóan.")
 .addField(".rss", "A telex.hu híroldal RSS-híreinek lekérése.")
+.addField(".rssd <page> <url>", "RSS hírek <url> helyről, a <page> oldalról.")
+.addField(".ban <member> ", "<member> kitiltása a szerverről. (Csak megfelelő ranggal használható.)")
+.addField(".kick <member> ", "<member> kidobása a szerverről. (Csak megfelelő ranggal használható.)")
+.addField(".xp", "Az üzenet küldőjének XP-pontjainak lekérése a bot adatbázisából (1 üzenet, 1 pont)")
+.addField(".purge <count> ", "<count> számú üzenet törlése a csatornából. (Csak megfelelő ranggal használható.)")
+.addField('.minecraft' , 'Hypixel szerver státusz.')
+.addField('.minecraftd <url>' , 'Minecraft szerver státusz <url>-hez.')
+.addField('.nevnap', 'Mai névnap lekérése (Magyarország).')
 msg.reply(embed)
   }
 });
+
+*/
 
 //Ehhez ne nyúlj hozzá, ha kedves az életed
 
 client.on('message', msg => {
   if (msg.content === '.weather') {
+    leveling.AddXp(msg.member.user.id, -1)
 
 async function getWeather() {
     const data = await weather.loction('Budapest');
+    var image = `https:${data.current.condition.icon}`
     const embed = new Discord.MessageEmbed()
   .setTitle("Budapesti időjárás")
   .setColor('#0c9417')
@@ -289,9 +677,80 @@ async function getWeather() {
   .setAuthor("Boobinator")
   .addField('Hőmérséklet', data.current.temp_c + 'C°')
   .addField('Idő', data.location.localtime)
-    msg.reply(embed)
+  .addField('Időjárás',data.current.condition.text)
+  .setImage(image)
+  msg.reply(embed)
 }
 getWeather();
+}
+});
+
+
+client.on('message', msg => {
+  if (msg.content === '.nevnap') {
+    leveling.AddXp(msg.member.user.id, -1)
+  const embed = new Discord.MessageEmbed()
+  .setTitle("Mai névnap")
+  .setColor('#0e58cf')
+  .setDescription("Magyar névnapok.")
+  .setAuthor("Boobinator")
+  .addField('Ma:', nevnap.today())
+  msg.reply(embed)
+}
+});
+
+const pg1 = new Discord.MessageEmbed()
+.setTitle("Command List.")
+.setDescription("Parancsok listája. Prefixum: .")
+.setAuthor("Boobinator")
+.addField("Moderáció", "A csetbot képes a csúnya szavak szűrésére, szövegkörnyezetben is.")
+.addField(".help", "Ezen útmutató lekérése")
+.addField(".porn", "Véletlenszerű NSFW GIF lekérése")
+.addField(".joke", "Véletlenszerű vicc az adatbázisból (bővítés alatt)")
+.addField(".covid", "Covid információk a világra és országunkra vonatkozóan.")
+.addField(".coin", "Egy pénz véletlen feldobása.")
+
+const pg2 = new Discord.MessageEmbed()
+.setTitle("Command List.")
+.setDescription("Parancsok listája. Prefixum: .")
+.setAuthor("Boobinator")
+.addField(".meme", "Egy Véletlenszerű Reddit mém lekérése.")
+.addField(".weather", "Budapesti időjárás lekérése")
+.addField(".weatherd <hely>", "Időjárás <hely>-re vonatkozóan.")
+.addField(".rss", "A telex.hu híroldal RSS-híreinek lekérése.")
+.addField(".rssd <page> <url>", "RSS hírek <url> helyről, a <page> oldalról.")
+.addField(".ban <member> ", "<member> kitiltása a szerverről. (Csak megfelelő ranggal használható.)")
+
+
+const pg3 = new Discord.MessageEmbed()
+.setTitle("Command List.")
+.setDescription("Parancsok listája. Prefixum: .")
+.setAuthor("Boobinator")
+.addField(".kick <member> ", "<member> kidobása a szerverről. (Csak megfelelő ranggal használható.)")
+.addField(".xp", "Az üzenet küldőjének XP-pontjainak lekérése a bot adatbázisából (1 üzenet, 1 pont)")
+.addField(".purge <count> ", "<count> számú üzenet törlése a csatornából. (Csak megfelelő ranggal használható.)")
+.addField('.minecraft' , 'Hypixel szerver státusz.')
+.addField('.minecraftd <url>' , 'Minecraft szerver státusz <url>-hez.')
+.addField('.nevnap', 'Mai névnap lekérése (Magyarország).')
+
+const pages = [
+    pg1,
+    pg2,
+    pg3
+];
+
+
+
+
+client.on('message', msg => {
+  if (msg.content === '.help') {
+    leveling.AddXp(msg.member.user.id, -1)
+  const embedPages = new DiscordPages({ 
+    pages: pages, 
+    channel: msg.channel, 
+});
+
+	embedPages.createPages();
 }
 });
 
