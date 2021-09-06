@@ -11,11 +11,16 @@
   "license": "ISC",
   "dependencies": {
     "corona-info": "^1.1.1",
+    "discord-leveling": "^1.1.0",
     "discord.js": "^12.5.3",
     "express": "^4.17.1",
+    "minecraft-server-status": "^1.0.1",
+    "nameday-api": "^2.0.6",
     "random-hub": "^1.0.0",
     "reddit-image-fetcher": "^2.0.7",
     "rss-url-parser": "^2.2.0",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2",
     "weather-api-data": "^1.0.7"
   }
 }
