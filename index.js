@@ -892,6 +892,6 @@ client.on('message', msg => {
 
 //Token helye
 
-client.login('ODYzMDcyNjY0ODYzNzY4NjA2.YOhlDg.NhNpTMJb0yO5mnKnXhXGF2BQn28');
+client.login('No token for you. :-(');
 
 
